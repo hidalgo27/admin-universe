@@ -2,7 +2,7 @@
 $body-bg: #f8fafc;
 
 // Typography
-$font-family-sans-serif: 'Nunito', sans-serif;
+$font-family-sans-serif: "Quicksand", sans-serif;
 $font-size-base: 0.9rem;
 $line-height-base: 1.6;
 
@@ -17,3 +17,18 @@ $yellow: #ffed4a;
 $green: #38c172;
 $teal: #4dc0b5;
 $cyan: #6cb2eb;
+
+$breadcrumb-divider: quote(">");
+$fa-font-path:        "../webfonts";
+
+$carousel-control-color: #333333;
+$g-green:    #7F8429 !default;
+$g-yellow:   #f9a825 !default;
+$g-dark:   #333333 !default;
+
+$theme-colors: () !default;
+$theme-colors: map-merge((
+    "g-green": $g-green,
+    "g-yellow": $g-yellow,
+    "g-dark": $g-dark
+), $theme-colors);

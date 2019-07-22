@@ -1,0 +1,45 @@
+
+// Fonts
+@import url("https://fonts.googleapis.com/css?family=Raleway:300,400,600");
+@import url('https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700,800');
+
+// Variables
+@import "variables";
+
+// Bootstrap
+@import "~bootstrap/scss/bootstrap";
+@import "~bootstrap4-toggle/css/bootstrap4-toggle.min.css";
+
+@import "~bootstrap-select/sass/bootstrap-select";
+
+//animate
+//@import "~animate.css/animate.css";
+@import "~swiper/dist/css/swiper.min.css";
+
+// Web
+@import "admin";
+//jquery-ui
+//@import '~jquery-ui/themes/base/all.css';
+//@import "~intl-tel-input/src/css/intlTelInput";
+//@import "~owl.carousel/src/scss/owl.carousel";
+//slick carousel
+//@import "~slick-carousel/slick/slick";
+//@import "~slick-carousel/slick/slick-theme";
+//venobox
+//@import "~venobox/venobox/venobox.css";
+//dropzone
+@import "~bootstrap4c-dropzone/dist/css/component-dropzone.css";
+//fonts
+@import "~@fortawesome/fontawesome-free/scss/fontawesome";
+@import "~@fortawesome/fontawesome-free/scss/solid";
+@import "~@fortawesome/fontawesome-free/scss/brands";
+@import "~@fortawesome/fontawesome-free/scss/regular";
+//.font-montserrat{
+//  font-family: 'Montserrat', sans-serif;
+//}
+//.font-pompiere{
+//  font-family: 'Pompiere', cursive;
+//}
+//.font-roboto{
+//  font-family: 'Roboto', sans-serif;
+//}
