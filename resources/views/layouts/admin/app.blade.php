@@ -48,7 +48,7 @@
         <nav class="admin navbar navbar-dark navbar-expand-lg fixed-top bg-dark flex-md-nowrap p-0 shadow">
             {{--    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="{{ url('/home') }}">GotoPeru</a>--}}
             <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="{{ url('/home') }}">
-                <span class="text-g-green">GO</span><span class="text-g-yellow">TO</span><span class="text-white">PERU</span>
+                <span class="text-g-green">MI EMPRESA</span>
             </a>
             {{--<input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">--}}
             <ul class="navbar-nav ml-auto px-3">
