@@ -4,79 +4,44 @@ namespace App\Http\Controllers\Admin;
 
 use App\TItinerario;
 use App\TItinerarioImagen;
+use App\TPaqueteImagen;
 use Faker\Provider\File;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class ItineraryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
-        $itinerary = TItinerario::all()->sortBy('id');
+        $itinerary = TItinerario::paginate(10);
         return view('admin.itinerary', compact('itinerary'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        return view('admin.itinerary-create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        $codigo = $_POST["txt_codigo"];
+//        $codigo = $_POST["txt_codigo"];
         $title = $_POST["txt_title"];
         $short = $_POST["txta_short"];
         $extended = $_POST["txta_extended"];
 
-        if ($request->filled(['txt_codigo', 'txt_title'])){
+        if ($request->filled(['txt_title'])){
 
             $itinerary = new TItinerario();
-            $itinerary->codigo = $codigo;
+//            $itinerary->codigo = $codigo;
             $itinerary->titulo = $title;
             $itinerary->resumen = $short;
             $itinerary->descripcion = $extended;
             $itinerary->save();
 
-            return redirect(route('admin_itinerary_index_path'))->with('status', 'Itinerary created successfully');
+            return redirect(route('admin_itinerary_edit_path', $itinerary->id))->with('status', 'Itinerary created successfully');
 
         }else{
             return "false";
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         $itinerary = TItinerario::with('itinerario_imagen')->where('id', $id)->get();
@@ -84,13 +49,6 @@ class ItineraryController extends Controller
         return view('admin.itinerary-edit', ['itinerary'=>$itinerary]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         $codigo = $_POST["txt_codigo"];
@@ -98,7 +56,7 @@ class ItineraryController extends Controller
         $short = $_POST["txta_short"];
         $extended = $_POST["txta_extended"];
 
-        if ($request->filled(['txt_codigo', 'txt_title'])){
+        if ($request->filled(['txt_title'])){
 
             $itinerary = TItinerario::FindOrFail($id);
             $itinerary->codigo = $codigo;
@@ -114,12 +72,6 @@ class ItineraryController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         $itinerary=TItinerario::find($id);
@@ -129,26 +81,53 @@ class ItineraryController extends Controller
 
     public function image_store(Request $request)
     {
-        $image = $request->file('file');
-        $id_itinerary = $request->input('id_itinerary_file');
-        $imageName = $image->getClientOriginalName();
-        $image->move(public_path('images/itinerario/'), $imageName);
+
+        if($request->hasFile('file')) {
+
+            //get filename with extension
+            $filenamewithextension = $request->file('file')->getClientOriginalName();
+
+            //get filename without extension
+            $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
+
+            //get file extension
+            $extension = $request->file('file')->getClientOriginalExtension();
+
+            //filename to store
+            $filenametostore = $filename.'_'.time().'.'.$extension;
+
+            //Upload File to s3
+            Storage::disk('s3')->put('itinerary/'.$filenametostore, fopen($request->file('file'), 'r+'), 'public');
+
+            //Store $filenametostore in the database
+
+            $imageName = Storage::disk('s3')->url('itinerary/'.$filenametostore);
+
+        }
 
         $imageUpload = new TItinerarioImagen();
         $imageUpload->nombre = $imageName;
-        $imageUpload->iditinerario = $id_itinerary;
+        $imageUpload->iditinerario = $request->input('id_itinerary_file');
         $imageUpload->save();
         return response()->json(['success' => $imageName]);
     }
 
     public function image_delete(Request $request)
     {
-        $filename = $request->get('filename');
-        TItinerarioImagen::where('nombre', $filename)->delete();
-        $path = public_path() . '/images/itinerario/' . $filename;
-        if (file_exists($path)) {
-            unlink($path);
-        }
+        $filename = $request->get('name_file');
+        $id_itinerary = $request->get('id_itinerary_file');
+
+        $filename = explode('.', $filename);
+        $filename=$filename[0];
+
+        $itinerario_imagen = TItinerarioImagen::where('iditinerario', $id_itinerary)->where('nombre', 'like', '%'.$filename.'%')->first();
+
+        $filename = explode('itinerary/', $itinerario_imagen->nombre);
+        $filename = $filename[1];
+        Storage::disk('s3')->delete('itinerary/'.$filename);
+
+        TItinerarioImagen::where('id', $itinerario_imagen->id)->delete();
+
         return $filename;
     }
 
@@ -157,10 +136,11 @@ class ItineraryController extends Controller
         $filename = $request->get('filename');
         $id_itinerario = $request->get('id_itinerario');
         TItinerarioImagen::where('nombre', $filename)->delete();
-        $path = public_path() . '/images/itinerario/' . $filename;
-        if (file_exists($path)) {
-            unlink($path);
-        }
+
+        $filename = explode('itinerary/', $filename);
+        $filename = $filename[1];
+        Storage::disk('s3')->delete('itinerary/'.$filename);
+
         return redirect(route('admin_itinerary_edit_path', $id_itinerario))->with('delete', 'Image successfully removed');
     }
 

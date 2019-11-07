@@ -12,7 +12,7 @@
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb small font-weight-bold p-0 m-0 bg-white">
                                 <li class="breadcrumb-item"><a href="#">1. Dashboard</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">All Packages</li>
+                                <li class="breadcrumb-item active" aria-current="page">All Destinations</li>
                             </ol>
                         </nav>
                     </div>
@@ -47,7 +47,7 @@
         <div class="toast bg-primary fixed-top" role="alert" aria-live="polite" aria-atomic="true" data-delay="10000" style="left: auto; top: 55px; right: 10px;">
             <div class="toast-header">
                 <span data-feather="alert-circle" class="text-success mr-2"></span>
-                <strong class="mr-auto">Itinerary</strong>
+                <strong class="mr-auto">Destinations</strong>
                 <small>
                     @php
                         date_default_timezone_set('America/Lima');
@@ -68,7 +68,7 @@
         <div class="toast bg-danger fixed-top" role="alert" aria-live="polite" aria-atomic="true" data-delay="10000" style="left: auto; top: 55px; right: 10px;">
             <div class="toast-header">
                 <span data-feather="alert-circle" class="text-success mr-2"></span>
-                <strong class="mr-auto">Itinerary</strong>
+                <strong class="mr-auto">Destinations</strong>
                 <small>
                     @php
                         date_default_timezone_set('America/Lima');
@@ -91,7 +91,7 @@
             <div class="table-title m-0">
                 <div class="row">
                     <div class="col-sm-6">
-                        <h2>Manage <b>Itinerary</b></h2>
+                        <h2>Manage <b>Destinations</b></h2>
                     </div>
                     <div class="col-sm-6">
                         <a href="{{route('admin_destinations_create_path')}}" class="btn btn-success"><span data-feather="plus-circle"></span> Add New Destination</a>
@@ -102,31 +102,30 @@
             <table class="table table-striped table-hover small table-sm font-weight-bold text-secondary">
                 <thead>
                 <tr>
-                    <th>
-							<span class="custom-checkbox">
-								<input type="checkbox" id="selectAll">
-								<label for="selectAll"></label>
-							</span>
-                    </th>
+{{--                    <th>--}}
+{{--							<span class="custom-checkbox">--}}
+{{--								<input type="checkbox" id="selectAll">--}}
+{{--								<label for="selectAll"></label>--}}
+{{--							</span>--}}
+{{--                    </th>--}}
                     <th>Destinations</th>
                     {{--<th>Region</th>--}}
-                    <th>Country</th>
-                    <th class="text-center">Actions</th>
+{{--                    <th>Country</th>--}}
+                    <th class="text-right">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
-                @foreach($destinations as $destination)
+                @foreach($destinations->sortBy('nombre') as $destination)
                         <tr>
-                            <td>
-                            <span class="custom-checkbox">
-                                <input type="checkbox" id="checkbox1" name="options[]" value="1" >
-                                <label for="checkbox1"></label>
-                            </span>
-                            </td>
-                            <td>{{$destination->nombre}} </td>
+{{--                            <td>--}}
+{{--                            <span class="custom-checkbox">--}}
+{{--                                <input type="checkbox" id="checkbox1" name="options[]" value="1" >--}}
+{{--                                <label for="checkbox1"></label>--}}
+{{--                            </span>--}}
+{{--                            </td>--}}
+                            <td><a href="{{route('admin_destinations_edit_path', $destination->id)}}">{{$destination->nombre}} <small>({{$destination->pais}})</small></a></td>
                             {{--<td>{{$destination->region}}</td>--}}
-                            <td>{{$destination->pais}}</td>
-                            <td class="text-center">
+                            <td class="text-right">
                                 <a href="{{route('admin_destinations_edit_path', $destination->id)}}" class="edit"><span data-feather="edit"></span></a>
                                 <a href="#delete_destination_{{$destination->id}}" class="delete" data-toggle="modal"><span data-feather="trash"></span></a>
                             </td>
@@ -158,17 +157,10 @@
                 @endforeach
                 </tbody>
             </table>
-            <div class="clearfix">
-                <div class="hint-text">Showing <b>5</b> out of <b>25</b> entries</div>
-                <ul class="pagination">
-                    <li class="page-item disabled"><a href="#">Previous</a></li>
-                    <li class="page-item"><a href="#" class="page-link">1</a></li>
-                    <li class="page-item"><a href="#" class="page-link">2</a></li>
-                    <li class="page-item active"><a href="#" class="page-link">3</a></li>
-                    <li class="page-item"><a href="#" class="page-link">4</a></li>
-                    <li class="page-item"><a href="#" class="page-link">5</a></li>
-                    <li class="page-item"><a href="#" class="page-link">Next</a></li>
-                </ul>
+            <div class="row justify-content-center">
+                <div class="col-auto">
+                    {{ $destinations->links() }}
+                </div>
             </div>
         </div>
     </div>

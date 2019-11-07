@@ -95,36 +95,64 @@
             <table class="table table-striped table-hover small table-sm font-weight-bold text-secondary">
                 <thead>
                 <tr>
-                    <th>
-							<span class="custom-checkbox">
-								<input type="checkbox" id="selectAll">
-								<label for="selectAll"></label>
-							</span>
-                    </th>
-                    <th>Code</th>
+{{--                    <th>--}}
+{{--							<span class="custom-checkbox">--}}
+{{--								<input type="checkbox" id="selectAll">--}}
+{{--								<label for="selectAll"></label>--}}
+{{--							</span>--}}
+{{--                    </th>--}}
+                    <th>Duration</th>
                     <th>Name</th>
                     {{--<th>Address</th>--}}
-                    <th>Status</th>
+                    <th class="text-center">Homepage?</th>
+                    <th class="text-center">Package?</th>
+                    <th class="text-center">Tours?</th>
                     <th class="text-center">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
-                @foreach($paquete as $paquetes)
+                @foreach($paquete->sortBy('duracion') as $paquetes)
                     @if ($paquetes->estado == 0)
                         @php $estado_paquete = ""; @endphp
                     @else
                         @php $estado_paquete = "checked"; @endphp
                     @endif
+
+                    @if ($paquetes->is_paquete == 0)
+                        @php $is_paquete = ""; @endphp
+                    @else
+                        @php $is_paquete = "checked"; @endphp
+                    @endif
+
+                    @if ($paquetes->is_tours == 0)
+                        @php $is_tours = ""; @endphp
+                    @else
+                        @php $is_tours = "checked"; @endphp
+                    @endif
                     <tr>
-                        <td>
-                            <span class="custom-checkbox">
-                                <input type="checkbox" id="checkbox1" name="options[]" value="1" >
-                                <label for="checkbox1"></label>
-                            </span>
-                        </td>
-                        <td>{{$paquetes->codigo}} </td>
+{{--                        <td>--}}
+{{--                            <span class="custom-checkbox">--}}
+{{--                                <input type="checkbox" id="checkbox1" name="options[]" value="1" >--}}
+{{--                                <label for="checkbox1"></label>--}}
+{{--                            </span>--}}
+{{--                        </td>--}}
+                        <td><span class="font-weight-bold">{{$paquetes->duracion}} day</span></td>
                         <td><a href="{{route('admin_package_edit_path', $paquetes->id)}}">{{$paquetes->titulo}}</a></td>
-                        <td><input type="checkbox" {{$estado_paquete}} data-toggle="toggle" data-size="xs"></td>
+                        <td class="text-center">
+                            <form id="form_estado_{{$paquetes->id}}">
+                                <input type="checkbox" {{$estado_paquete}} value="{{$paquetes->id}}" name="txt_estado" data-toggle="toggle" data-size="xs" onchange="estado_home({{$paquetes->id}})">
+                            </form>
+                        </td>
+                        <td class="text-center">
+                            <form id="form_is_package_{{$paquetes->id}}">
+                                <input type="checkbox" {{$is_paquete}} value="{{$paquetes->id}}" name="txt_is_package" data-toggle="toggle" data-size="xs" onchange="is_package({{$paquetes->id}})">
+                            </form>
+                        </td>
+                        <td class="text-center">
+                            <form id="form_is_tours_{{$paquetes->id}}">
+                                <input type="checkbox" {{$is_tours}} value="{{$paquetes->id}}" name="txt_is_tour" data-toggle="toggle" data-size="xs" onchange="is_tours({{$paquetes->id}})">
+                            </form>
+                        </td>
                         {{--<td>(171) 555-2222</td>--}}
                         <td class="text-center">
                             <a href="{{route('admin_package_edit_path', $paquetes->id)}}" class="edit"><span data-feather="edit-3"></span></a>
@@ -157,17 +185,21 @@
                 @endforeach
                 </tbody>
             </table>
-            <div class="clearfix">
-                <div class="hint-text">Showing <b>5</b> out of <b>25</b> entries</div>
-                <ul class="pagination">
-                    <li class="page-item disabled"><a href="#">Previous</a></li>
-                    <li class="page-item"><a href="#" class="page-link">1</a></li>
-                    <li class="page-item"><a href="#" class="page-link">2</a></li>
-                    <li class="page-item active"><a href="#" class="page-link">3</a></li>
-                    <li class="page-item"><a href="#" class="page-link">4</a></li>
-                    <li class="page-item"><a href="#" class="page-link">5</a></li>
-                    <li class="page-item"><a href="#" class="page-link">Next</a></li>
-                </ul>
+            <div class="row justify-content-center">
+                <div class="col-auto">
+                    {{ $paquete->links() }}
+                </div>
+
+{{--                <div class="hint-text">Showing <b>5</b> out of <b>25</b> entries</div>--}}
+{{--                <ul class="pagination">--}}
+{{--                    <li class="page-item disabled"><a href="#">Previous</a></li>--}}
+{{--                    <li class="page-item"><a href="#" class="page-link">1</a></li>--}}
+{{--                    <li class="page-item"><a href="#" class="page-link">2</a></li>--}}
+{{--                    <li class="page-item active"><a href="#" class="page-link">3</a></li>--}}
+{{--                    <li class="page-item"><a href="#" class="page-link">4</a></li>--}}
+{{--                    <li class="page-item"><a href="#" class="page-link">5</a></li>--}}
+{{--                    <li class="page-item"><a href="#" class="page-link">Next</a></li>--}}
+{{--                </ul>--}}
             </div>
         </div>
     </div>
@@ -265,6 +297,61 @@
 @endsection
 @push('scripts')
     <script type="text/javascript">
+
+        function estado_home($id_estado) {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            var dataString = $('#form_estado_'+$id_estado).serialize()+'&'+$.param({ 'id_estado': $id_estado });
+            // alert('Datos serializados: '+dataString);
+            $.ajax({
+                type: "POST",
+                url: '{{route('estado_home_path')}}',
+                data: dataString,
+                success: function(data) {
+                    // document.getElementById('precio_persona').innerHTML = data;
+                }
+            });
+        }
+
+        function is_package($id_is_package) {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            var dataString = $('#form_is_package_'+$id_is_package).serialize()+'&'+$.param({ 'id_is_package': $id_is_package });
+            // alert('Datos serializados: '+dataString);
+            $.ajax({
+                type: "POST",
+                url: '{{route('is_package_path')}}',
+                data: dataString,
+                success: function(data) {
+                    // document.getElementById('precio_persona').innerHTML = data;
+                }
+            });
+        }
+
+        function is_tours($id_is_tours) {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            var dataString = $('#form_is_tours_'+$id_is_tours).serialize()+'&'+$.param({ 'id_is_tours': $id_is_tours });
+            // alert('Datos serializados: '+dataString);
+            $.ajax({
+                type: "POST",
+                url: '{{route('is_tours_path')}}',
+                data: dataString,
+                success: function(data) {
+                    // document.getElementById('precio_persona').innerHTML = data;
+                }
+            });
+        }
+
         $(document).ready(function(){
             // Activate tooltip
             // $('[data-toggle="tooltip"]').tooltip();

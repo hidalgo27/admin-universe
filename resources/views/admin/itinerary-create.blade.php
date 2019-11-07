@@ -23,12 +23,12 @@
     <form action="{{route('admin_itinerary_store_path')}}" method="post">
         @csrf
     <div class="row">
-        <div class="col-2">
-            <div class="form-group">
-                <label class="font-weight-bold text-secondary small" for="txt_codigo">Code</label>
-                <input type="text" name="txt_codigo" class="form-control font-weight-bold" id="txt_codigo" placeholder="" value="{{old('txt_codigo')}}">
-            </div>
-        </div>
+{{--        <div class="col-2">--}}
+{{--            <div class="form-group">--}}
+{{--                <label class="font-weight-bold text-secondary small" for="txt_codigo">Code</label>--}}
+{{--                <input type="text" name="txt_codigo" class="form-control font-weight-bold" id="txt_codigo" placeholder="" value="{{old('txt_codigo')}}">--}}
+{{--            </div>--}}
+{{--        </div>--}}
         <div class="col">
             <div class="form-group">
                 <label class="font-weight-bold text-secondary small" for="txt_title">Title Package</label>

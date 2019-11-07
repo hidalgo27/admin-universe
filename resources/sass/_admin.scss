@@ -357,3 +357,34 @@ table.table .avatar {
   white-space: nowrap;
 }
 //dropzone
+//body {
+//    background: #FFF url("http://i.imgur.com/KheAuef.png") top left repeat-x;
+//    font-family:"Brush Script MT", cursive;
+//}
+//h1 {
+//    font-size: 2em;
+//    margin-bottom: 0.2em;
+//    padding-bottom: 0;
+//}
+//p {
+//    font-size: 1.5em;
+//    margin-top: 0;
+//    padding-top: 0;
+//}
+#app {
+    display: none;
+}
+#loading {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    background-image: url(/images/spinner.gif);
+    background-size: 50px;
+    background-repeat: no-repeat;
+    background-position: center;
+}

@@ -28,7 +28,7 @@
         <div class="toast bg-danger fixed-top" role="alert" aria-live="polite" aria-atomic="true" data-delay="10000" style="left: auto; top: 55px; right: 10px;">
             <div class="toast-header">
                 <span data-feather="alert-circle" class="text-success mr-2"></span>
-                <strong class="mr-auto">Video</strong>
+                <strong class="mr-auto">Destination</strong>
                 <small>
                     @php
                         date_default_timezone_set('America/Lima');
@@ -52,7 +52,7 @@
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb small font-weight-bold p-0 m-0 bg-white">
                                 <li class="breadcrumb-item"><a href="#">1. Dashboard</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">All Packages</li>
+                                <li class="breadcrumb-item active" aria-current="page">Destinations Edit</li>
                             </ol>
                         </nav>
                     </div>
@@ -60,116 +60,149 @@
             </div>
         </section>
     </div>
-    @foreach($destinations as $destination)
-        <form action="{{route('admin_destinations_update_path', $destination->id)}}" method="post">
-            @csrf
-            <div class="row">
-                <div class="col">
-                    <div class="form-group">
-                        <label class="font-weight-bold text-secondary small" for="txt_destination">Destination</label>
-                        <input type="text" name="txt_destination" class="form-control font-weight-bold" id="txt_destination" placeholder="" value="{{$destination->nombre}}">
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="form-group">
-                        <label class="font-weight-bold text-secondary small" for="txt_country">Country</label>
-                        <input type="text" name="txt_country" class="form-control font-weight-bold" id="txt_country" value="{{$destination->pais}}">
-                    </div>
-                </div>
-            </div>
+    <div class="row">
+        @foreach($destinations as $destination)
 
-            <div class="row">
-                <div class="col">
-                    <h3 class="font-weight-bold text-secondary small">Short</h3>
-                    <div class="form-group">
-                        <textarea class="textarea-package" name="txta_short">{{$destination->resumen}}</textarea>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <h3 class="font-weight-bold text-secondary small">Extended</h3>
-                    <div class="form-group">
-                        <textarea class="textarea-package" name="txta_extended">{{$destination->descripcion}}</textarea>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <h3 class="font-weight-bold text-secondary small">History</h3>
-                    <div class="form-group">
-                        <textarea class="textarea-package" name="txta_history">{{$destination->historia}}</textarea>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <h3 class="font-weight-bold text-secondary small">Geography</h3>
-                    <div class="form-group">
-                        <textarea class="textarea-package" name="txta_geography">{{$destination->geografia}}</textarea>
-                    </div>
-                </div>
-            </div>
-            <hr>
-            <div class="row mb-3">
-                <div class="col text-center">
-                    {{--<a href="" class="btn btn-primary font-weight-bold">Update Package</a>--}}
-                    <button type="submit" class="btn btn-primary font-weight-bold">Update destination</button>
-                </div>
-            </div>
-        </form>
-
-
-        <div class="row my-5">
-            <div class="col-9">
+            <div class="col-3">
                 <div class="row">
-                    @foreach($destination->destino_imagen as $imagen)
-                        <div class="col-3 text-center">
-                            <img src="{{asset('/images/destinations/banners/'.$imagen->nombre.'')}}" alt="" class="img-thumbnail w-100 mb-2">
-                            <form action="{{route('admin_destinations_slider_form_delete_path')}}" method="post">
-{{--                                @method('DELETE')--}}
+                    <div class="col-12 text-center">
+                        @if ($destination->imagen)
+                            <p class="font-weight-bold text-secondary small pb-1 mb-2">Destinations Thumbnail Image <span class="badge badge-warning">300x300 PX</span></p>
+                            <img src="{{$destination->imagen}}" alt="" class="img-thumbnail w-100 mb-2">
+                            <form action="{{route('admin_destinations_image_form_delete_path')}}" method="post">
                                 @csrf
-                                <input type="hidden" name="id_destinos" value="{{$destination->id}}">
-                                <input type="hidden" name="filename" value="{{$imagen->nombre}}">
+                                <input type="hidden" name="id_destino" value="{{$destination->id}}">
                                 <button type="submit" class="btn btn-xs btn-danger">Eliminar</button>
                             </form>
+                        @endif
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        @if ($destination->imagen ==NULL)
+                            <p class="font-weight-bold text-secondary small pb-1 mb-2">Destinations Thumbnail Image <span class="badge badge-warning">300x300 PX</span></p>
+                            <form method="post" action="{{route('admin_image_destinations_image_store_path')}}" enctype="multipart/form-data"
+                                  class="dropzone" id="dropzone_imagen">
+                                <input type="hidden" value="{{$destination->id}}" name="id_destinations_file">
+                                @csrf
+                            </form>
+                        @endif
+                    </div>
+                    @if ($destination->destino_imagen->count() > 0)
+                    <div class="col-12 mb-4">
+                        <p class="font-weight-bold text-secondary small pb-1 mb-2">Slider Destinations Images</p>
+                        <div class="row">
+                            <div class="col">
+                                <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                                    <div class="carousel-inner text-center">
+                                        @php $imagen_slider = 0; @endphp
+                                        @foreach($destination->destino_imagen as $imagen)
+                                            @if ($imagen_slider == 0)
+                                                @php $item_carousel = "active";  @endphp
+                                            @else
+                                                @php $item_carousel = "";  @endphp
+                                            @endif
+                                            <div class="carousel-item {{$item_carousel}}">
+                                                <img src="{{$imagen->nombre}}" alt="" class="img-thumbnail w-100 mb-2">
+                                                <form action="{{route('admin_destinations_slider_form_delete_path')}}" method="post">
+                                                    @csrf
+                                                    <input type="hidden" name="id_destinos" value="{{$destination->id}}">
+                                                    <input type="hidden" name="id_destinos_imagen" value="{{$imagen->id}}">
+                                                    <input type="hidden" name="filename" value="{{$imagen->nombre}}">
+                                                    <button type="submit" class="btn btn-xs btn-danger">Eliminar</button>
+                                                </form>
+                                            </div>
+                                                @php $imagen_slider++; @endphp
+                                        @endforeach
+                                    </div>
+                                    <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                    <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </div>
+
+                            </div>
                         </div>
-                    @endforeach
+                    </div>
+                    @endif
+                    <div class="col-12">
+                        <p class="font-weight-bold text-secondary small pb-1 mb-2">Slider Destinations Images <span class="badge badge-warning">300x300 PX</span></p>
+                        <form method="post" action="{{route('admin_image_destinations_slider_store_path')}}" enctype="multipart/form-data"
+                              class="dropzone" id="dropzone_destinations">
+                            <input type="hidden" value="{{$destination->id}}" name="id_destinations_file">
+                            @csrf
+                        </form>
+                    </div>
+
                 </div>
             </div>
-            <div class="col text-center">
-                @if ($destination->imagen)
-                    <img src="{{asset('/images/destinations/'.$destination->imagen.'')}}" alt="" class="img-thumbnail w-100 mb-2">
-                    <form action="{{route('admin_destinations_image_form_delete_path')}}" method="post">
-{{--                        @method('DELETE')--}}
-                        @csrf
-                        <input type="hidden" name="id_destino" value="{{$destination->id}}">
-                        <button type="submit" class="btn btn-xs btn-danger">Eliminar</button>
-                    </form>
-                @endif
-            </div>
-        </div>
-        <div class="row my-5">
             <div class="col-9">
-                <form method="post" action="{{route('admin_image_destinations_slider_store_path')}}" enctype="multipart/form-data"
-                      class="dropzone" id="dropzone_destinations">
-                    <input type="hidden" value="{{$destination->id}}" name="id_destinations_file">
+                <form action="{{route('admin_destinations_update_path', $destination->id)}}" method="post">
                     @csrf
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label class="font-weight-bold text-secondary small" for="txt_destination">Destination</label>
+                                <input type="text" name="txt_destination" class="form-control font-weight-bold" id="txt_destination" placeholder="" value="{{$destination->nombre}}">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label class="font-weight-bold text-secondary small" for="txt_country">Country</label>
+                                <input type="text" name="txt_country" class="form-control font-weight-bold" id="txt_country" value="{{$destination->pais}}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <h3 class="font-weight-bold text-secondary small">Short</h3>
+                            <div class="form-group">
+                                <textarea class="textarea-package" name="txta_short">{{$destination->resumen}}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h3 class="font-weight-bold text-secondary small">Extended</h3>
+                            <div class="form-group">
+                                <textarea class="textarea-package" name="txta_extended">{{$destination->descripcion}}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h3 class="font-weight-bold text-secondary small">History</h3>
+                            <div class="form-group">
+                                <textarea class="textarea-package" name="txta_history">{{$destination->historia}}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h3 class="font-weight-bold text-secondary small">Geography</h3>
+                            <div class="form-group">
+                                <textarea class="textarea-package" name="txta_geography">{{$destination->geografia}}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row mb-3">
+                        <div class="col text-center">
+                            {{--<a href="" class="btn btn-primary font-weight-bold">Update Package</a>--}}
+                            <button type="submit" class="btn btn-primary font-weight-bold">Update destination</button>
+                        </div>
+                    </div>
                 </form>
             </div>
-            <div class="col">
-                @if ($destination->imagen ==NULL)
-                <form method="post" action="{{route('admin_image_destinations_image_store_path')}}" enctype="multipart/form-data"
-                      class="dropzone" id="dropzone_imagen">
-                    <input type="hidden" value="{{$destination->id}}" name="id_destinations_file">
-                    @csrf
-                </form>
-                @endif
-            </div>
-        </div>
 
+        @endforeach
+    </div>
 
-    @endforeach
 @endsection
 @push('scripts')
     <script>
@@ -188,15 +221,15 @@
                 addRemoveLinks: true,
                 timeout: 50000,
                 removedfile: function(file){
-                    var name = file.upload.filename;
-
+                    var name = file.name;
+                    var dataString = $('#dropzone_destinations').serialize()+'&'+$.param({ 'name_file': name });
                     $.ajax({
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
                         },
                         type: 'POST',
                         url: "{{ route('admin_destinations_slider_delete_path') }}",
-                        data: {filename: name},
+                        data: dataString,
                         success: function (data) {
                             console.log("File has been successfully removed!!");
                         },
@@ -230,15 +263,15 @@
                 addRemoveLinks: true,
                 timeout: 50000,
                 removedfile: function(file){
-                    var name = file.upload.filename;
-
+                    // var name = file.name;
+                    var dataString = $('#dropzone_imagen').serialize();
                     $.ajax({
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
                         },
                         type: 'POST',
                         url: "{{ route('admin_destinations_image_delete_path') }}",
-                        data: {filename: name},
+                        data: dataString,
                         success: function (data) {
                             console.log("File has been successfully removed!!");
                         },

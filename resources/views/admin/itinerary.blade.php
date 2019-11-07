@@ -102,32 +102,32 @@
             <table class="table table-striped table-hover small table-sm font-weight-bold text-secondary">
                 <thead>
                 <tr>
-                    <th>
-							<span class="custom-checkbox">
-								<input type="checkbox" id="selectAll">
-								<label for="selectAll"></label>
-							</span>
-                    </th>
-                    <th>Code</th>
+{{--                    <th>--}}
+{{--							<span class="custom-checkbox">--}}
+{{--								<input type="checkbox" id="selectAll">--}}
+{{--								<label for="selectAll"></label>--}}
+{{--							</span>--}}
+{{--                    </th>--}}
+{{--                    <th>Code</th>--}}
                     <th>Title</th>
                     {{--<th>Address</th>--}}
-                    <th class="text-center">Actions</th>
+                    <th class="text-right">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($itinerary as $itinerario)
 
                     <tr>
-                        <td>
-                            <span class="custom-checkbox">
-                                <input type="checkbox" id="checkbox1" name="options[]" value="1" >
-                                <label for="checkbox1"></label>
-                            </span>
-                        </td>
-                        <td>{{$itinerario->codigo}} </td>
-                        <td>{{$itinerario->titulo}}</td>
+{{--                        <td>--}}
+{{--                            <span class="custom-checkbox">--}}
+{{--                                <input type="checkbox" id="checkbox1" name="options[]" value="1" >--}}
+{{--                                <label for="checkbox1"></label>--}}
+{{--                            </span>--}}
+{{--                        </td>--}}
+{{--                        <td>{{$itinerario->codigo}} </td>--}}
+                        <td><a href="{{route('admin_itinerary_edit_path', $itinerario->id)}}">{{$itinerario->titulo}}</a></td>
                         {{--<td>(171) 555-2222</td>--}}
-                        <td class="text-center">
+                        <td class="text-right">
                             <a href="{{route('admin_itinerary_edit_path', $itinerario->id)}}" class="edit"><span data-feather="edit"></span></a>
                             <a href="#delete_itinerary_{{$itinerario->id}}" class="delete" data-toggle="modal"><span data-feather="trash"></span></a>
                         </td>
@@ -159,18 +159,23 @@
                 @endforeach
                 </tbody>
             </table>
-            <div class="clearfix">
-                <div class="hint-text">Showing <b>5</b> out of <b>25</b> entries</div>
-                <ul class="pagination">
-                    <li class="page-item disabled"><a href="#">Previous</a></li>
-                    <li class="page-item"><a href="#" class="page-link">1</a></li>
-                    <li class="page-item"><a href="#" class="page-link">2</a></li>
-                    <li class="page-item active"><a href="#" class="page-link">3</a></li>
-                    <li class="page-item"><a href="#" class="page-link">4</a></li>
-                    <li class="page-item"><a href="#" class="page-link">5</a></li>
-                    <li class="page-item"><a href="#" class="page-link">Next</a></li>
-                </ul>
+            <div class="row justify-content-center">
+                <div class="col-auto">
+                    {{ $itinerary->links() }}
+                </div>
             </div>
+{{--            <div class="clearfix">--}}
+{{--                <div class="hint-text">Showing <b>5</b> out of <b>25</b> entries</div>--}}
+{{--                <ul class="pagination">--}}
+{{--                    <li class="page-item disabled"><a href="#">Previous</a></li>--}}
+{{--                    <li class="page-item"><a href="#" class="page-link">1</a></li>--}}
+{{--                    <li class="page-item"><a href="#" class="page-link">2</a></li>--}}
+{{--                    <li class="page-item active"><a href="#" class="page-link">3</a></li>--}}
+{{--                    <li class="page-item"><a href="#" class="page-link">4</a></li>--}}
+{{--                    <li class="page-item"><a href="#" class="page-link">5</a></li>--}}
+{{--                    <li class="page-item"><a href="#" class="page-link">Next</a></li>--}}
+{{--                </ul>--}}
+{{--            </div>--}}
         </div>
     </div>
     <!-- Edit Modal HTML -->

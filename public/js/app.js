@@ -49518,9 +49518,9 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\Users\Sigma\proyectos\homestead\codigo\admin-universe\resources\js\app.js */"./resources/js/app.js");
-__webpack_require__(/*! C:\Users\Sigma\proyectos\homestead\codigo\admin-universe\resources\sass\app.scss */"./resources/sass/app.scss");
-module.exports = __webpack_require__(/*! C:\Users\Sigma\proyectos\homestead\codigo\admin-universe\resources\sass\admin.scss */"./resources/sass/admin.scss");
+__webpack_require__(/*! /Users/hidalgoponce/web/sites/admin-universe/resources/js/app.js */"./resources/js/app.js");
+__webpack_require__(/*! /Users/hidalgoponce/web/sites/admin-universe/resources/sass/app.scss */"./resources/sass/app.scss");
+module.exports = __webpack_require__(/*! /Users/hidalgoponce/web/sites/admin-universe/resources/sass/admin.scss */"./resources/sass/admin.scss");
 
 
 /***/ })

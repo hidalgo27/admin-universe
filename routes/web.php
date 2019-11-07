@@ -25,6 +25,20 @@ Route::get('/home', 'HomeController@index')->name('home');
 Auth::routes();
 Route::get('/home', 'Admin\HomeController@index')->name('home')->middleware('auth', 'role:admin');
 
+//package
+Route::post('admin/estado_home/', [
+    'uses' => 'Admin\PackageController@estado_home',
+    'as' => 'estado_home_path',
+]);
+Route::post('admin/is_package/', [
+    'uses' => 'Admin\PackageController@is_package',
+    'as' => 'is_package_path',
+]);
+Route::post('admin/is_tours/', [
+    'uses' => 'Admin\PackageController@is_tours',
+    'as' => 'is_tours_path',
+]);
+
 Route::get('admin/package/create', [
     'uses' => 'Admin\HomeController@create',
     'as' => 'admin_package_create_path',
@@ -83,6 +97,7 @@ Route::post('admin/package/image/image_delete_map_package_form', [
     'uses' => 'Admin\HomeController@image_delete_map_package_form',
     'as' => 'admin_image_delete_map_package_form_path',
 ]);
+
 //itinerary
 Route::get('admin/itinerary', [
     'uses' => 'Admin\ItineraryController@index',

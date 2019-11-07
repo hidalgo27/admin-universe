@@ -5,36 +5,16 @@ namespace App\Http\Controllers\admin;
 use App\TCategoria;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        $category = TCategoria::all()->sortBy('dia');
+        $category = TCategoria::paginate(10);
         return view('admin.category', compact('category'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-//        return view('admin.included-create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $category = $_POST["txt_category"];
@@ -54,42 +34,14 @@ class CategoryController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         $categoria = TCategoria::where('id', $id)->get();
         return view('admin.category-edit', compact('categoria'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-//        $category = $_POST["txt_category"];
-//        $descripcion = $_POST["txta_descripcion"];
-//        $group = $_POST["slc_group"];
-//        $order = $_POST["chk_order"];
 
         if ($request->filled(['txt_category'])){
 
@@ -118,12 +70,6 @@ class CategoryController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         $category2=TCategoria::find($id);
@@ -137,8 +83,13 @@ class CategoryController extends Controller
         $image = $request->file('file');
         $id_category = $request->get('id_category_file');
 
-        $imageName = $image->getClientOriginalName();
-        $image->move(public_path('images/banners/category'), $imageName);
+        $filenamewithextension = $request->file('file')->getClientOriginalName();
+        $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
+        $extension = $request->file('file')->getClientOriginalExtension();
+        $filenametostore = $filename.'_'.time().'.'.$extension;
+
+        Storage::disk('s3')->put('category/banner/'.$filenametostore, fopen($request->file('file'), 'r+'), 'public');
+        $imageName = Storage::disk('s3')->url('category/banner/'.$filenametostore);
 
         $imageUpload = TCategoria::FindOrFail($id_category);
         $imageUpload->imagen_banner = $imageName;
@@ -149,83 +100,86 @@ class CategoryController extends Controller
 
     public function image_category_slider_delete(Request $request)
     {
-        $filename = $request->get('filename');
-        $id_category = TCategoria::where('imagen_banner', $filename)->first();
+        $id_category_file = $request->get('id_category_file');
+        $category = TCategoria::find($id_category_file);
 
-        $category = TCategoria::FindOrFail($id_category->id);
-        $category->imagen_banner = NULL;
-        $category->save();
+        $filename = explode('category/banner/', $category->imagen_banner);
+        $filename = $filename[1];
+        Storage::disk('s3')->delete('category/banner/'.$filename);
 
-        $path = public_path() . '/images/banners/category/' . $filename;
-        if (file_exists($path)) {
-            unlink($path);
-        }
+        TCategoria::where('id', $id_category_file)->update(['imagen_banner' => NULL]);
+
         return $filename;
+
     }
 
     public function image_category_slider_form_delete(Request $request)
     {
-        $id_category = $request->get('id_category');
+        $id_category_file = $request->get('id_category');
+        $category = TCategoria::find($id_category_file);
 
-        $category = TCategoria::FindOrFail($id_category);
+        $filename = explode('category/banner/', $category->imagen_banner);
+        $filename = $filename[1];
+        Storage::disk('s3')->delete('category/banner/'.$filename);
 
-        $path = public_path() . '/images/banners/category/' . $category->imagen_banner;
-        if (file_exists($path) and $category->imagen_banner <> NULL) {
-            unlink($path);
-        }
-        $category->imagen_banner = NULL;
-        $category->save();
+        TCategoria::where('id', $id_category_file)->update(['imagen_banner' => NULL]);
 
-        return redirect(route('admin_category_edit_path', $id_category))->with('status', 'Successfully updated video');
+        return redirect(route('admin_category_edit_path', $id_category_file))->with('status', 'Successfully updated video');
     }
 
 
 
     public function image_category_image_store(Request $request)
     {
-        $image = $request->file('file');
+
         $id_category = $request->get('id_category_file');
 
-        $imageName = $image->getClientOriginalName();
-        $image->move(public_path('images/category'), $imageName);
+        $filenamewithextension = $request->file('file')->getClientOriginalName();
+        $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
+        $extension = $request->file('file')->getClientOriginalExtension();
+        $filenametostore = $filename.'_'.time().'.'.$extension;
+
+        Storage::disk('s3')->put('category/'.$filenametostore, fopen($request->file('file'), 'r+'), 'public');
+        $imageName = Storage::disk('s3')->url('category/'.$filenametostore);
 
         $imageUpload = TCategoria::FindOrFail($id_category);
         $imageUpload->imagen = $imageName;
         $imageUpload->save();
 
         return response()->json(['success' => $imageName]);
+
     }
 
     public function image_category_image_delete(Request $request)
     {
-        $filename = $request->get('filename');
-        $id_category = TCategoria::where('imagen', $filename)->first();
 
-        $category = TCategoria::FindOrFail($id_category->id);
-        $category->imagen = NULL;
-        $category->save();
+        $id_category_file = $request->get('id_category_file');
+        $category = TCategoria::find($id_category_file);
 
-        $path = public_path() . '/images/category/' . $filename;
-        if (file_exists($path)) {
-            unlink($path);
-        }
+        $filename = explode('category/', $category->imagen);
+        $filename = $filename[1];
+        Storage::disk('s3')->delete('category/'.$filename);
+
+        TCategoria::where('id', $id_category_file)->update(['imagen' => NULL]);
+
         return $filename;
+
     }
 
     public function image_category_image_form_delete(Request $request)
     {
-        $id_category = $request->get('id_category');
 
-        $category = TCategoria::FindOrFail($id_category);
+        $id_category_file = $request->get('id_category');
+        $category = TCategoria::find($id_category_file);
 
-        $path = public_path() . '/images/category/' . $category->imagen;
-        if (file_exists($path) and $category->imagen <> NULL) {
-            unlink($path);
-        }
-        $category->imagen = NULL;
-        $category->save();
+        $filename = explode('category/', $category->imagen);
+        $filename = $filename[1];
+        Storage::disk('s3')->delete('category/'.$filename);
 
-        return redirect(route('admin_category_edit_path', $id_category))->with('status', 'Successfully updated video');
+        TCategoria::where('id', $id_category_file)->update(['imagen' => NULL]);
+
+
+        return redirect(route('admin_category_edit_path', $id_category_file))->with('status', 'Successfully updated video');
     }
 
 

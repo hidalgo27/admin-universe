@@ -20,6 +20,7 @@ use App\TpaqueteItinerario;
 use App\TPaqueteNoIncluye;
 use App\TPrecioPaquete;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class HomeController extends Controller
@@ -32,7 +33,7 @@ class HomeController extends Controller
     {
         $request->user()->authorizeRoles(['user', 'admin']);
 
-        $paquete = TPaquete::all()->sortBy('duracion');
+        $paquete = TPaquete::paginate(10);
 
         return view('admin.home', compact('paquete'));
     }
@@ -63,7 +64,7 @@ class HomeController extends Controller
         foreach ($itinerario as $item) {
 //            return [$item->resumen, $id_itinerary_i[1]];
             return response()
-                ->json(['resumen' => $item->resumen, 'id' => $id_itinerary_i[1]]);
+                ->json(['resumen' => $item->resumen, 'descripcion' => $item->descripcion, 'id' => $id_itinerary_i[1]]);
         }
     }
 
@@ -73,7 +74,7 @@ class HomeController extends Controller
         $request->user()->authorizeRoles(['user', 'admin']);
 
         $paquete = TPaquete::where('id', $id)->get();
-        $itinerario = TItinerario::get()->unique('codigo')->take($duration);
+        $itinerario = TItinerario::get()->take($duration);
         $itinerario_full = TItinerario::all();
 //        dd($itinerario);
 
@@ -93,7 +94,7 @@ class HomeController extends Controller
         $destinations = TDestino::all();
         $incluye = TIncluye::all();
         $noincluye = TNoIncluye::all();
-        return view('admin.package-create', compact('paquete'), ['itinerario'=>$itinerario, 'itinerario_full' => $itinerario_full, 'level'=>$level, 'category'=>$category, 'destinations'=>$destinations, 'incluye'=>$incluye, 'noincluye'=>$noincluye]);
+        return view('admin.package-create', ['itinerario'=>$itinerario, 'itinerario_full' => $itinerario_full, 'level'=>$level, 'category'=>$category, 'destinations'=>$destinations, 'incluye'=>$incluye, 'noincluye'=>$noincluye]);
     }
     public function store(Request $request)
     {
@@ -104,7 +105,7 @@ class HomeController extends Controller
 
         $validator = Validator::make($request->all(), [
             'codigo' => 'required|unique:tpaquetes',
-            'codigo_f' => 'required',
+//            'codigo_f' => 'required',
             'titulo' => 'required|unique:tpaquetes',
             'duracion' => 'required',
         ]);
@@ -116,10 +117,13 @@ class HomeController extends Controller
 
             $package = new TPaquete();
             $package->codigo = $request->input('codigo');
-            $package->codigo_f = $request->input('codigo_f');
+//            $package->codigo_f = $request->input('codigo_f');
             $package->titulo = $request->input('titulo');
             $package->duracion = $request->input('duracion');
             $package->descripcion = $request->input('descripcion');
+            $package->incluye = $request->input('txta_included');
+            $package->noincluye = $request->input('txta_not_included');
+            $package->opcional = $request->input('txta_optional');
 
             if ($package->save()){
 
@@ -211,52 +215,53 @@ class HomeController extends Controller
                     TPaqueteDestino::where('idpaquetes', $package->id)->delete();
                 }
 
-                $package_included = TPaqueteIncluye::where('idpaquetes', $package->id)->get();
-                $var_i = [];
-                if ($request->input('include')) {
-                    foreach ($package_included as $package_i){
-                        if (!in_array($package_i->idincluye, $request->input('include'))){
-                            $temp = TPaqueteIncluye::find($package_i->id);
-                            $temp->delete();
-                        }
-                        $var_i[] = $package_i->idincluye;
-                    }
-                    for($i=0; $i < count($request->input('include')); $i++){
-                        if (!in_array($request->input('include')[$i], $var_i)){
-                            $package_included = new TPaqueteIncluye();
-                            $package_included->idpaquetes = $package->id;
-                            $package_included->idincluye = $request->input('include')[$i];
-                            $package_included->save();
-                        }
-                    }
-                }else{
-                    TPaqueteIncluye::where('idpaquetes', $package->id)->delete();
-                }
-
-                $package_no_included = TPaqueteNoIncluye::where('idpaquetes', $package->id)->get();
-                $var_i = [];
-                if ($request->input('noinclude')) {
-                    foreach ($package_no_included as $package_no_i){
-                        if (!in_array($package_no_i->idnoincluye, $request->input('noinclude'))){
-                            $temp = TPaqueteNoIncluye::find($package_no_i->id);
-                            $temp->delete();
-                        }
-                        $var_i[] = $package_no_i->idnoincluye;
-                    }
-                    for($i=0; $i < count($request->input('noinclude')); $i++){
-                        if (!in_array($request->input('noinclude')[$i], $var_i)){
-                            $package_no_included = new TPaqueteNoIncluye();
-                            $package_no_included->idpaquetes = $package->id;
-                            $package_no_included->idnoincluye = $request->input('noinclude')[$i];
-                            $package_no_included->save();
-                        }
-                    }
-                }else{
-                    TPaqueteNoIncluye::where('idpaquetes', $package->id)->delete();
-                }
+//                $package_included = TPaqueteIncluye::where('idpaquetes', $package->id)->get();
+//                $var_i = [];
+//                if ($request->input('include')) {
+//                    foreach ($package_included as $package_i){
+//                        if (!in_array($package_i->idincluye, $request->input('include'))){
+//                            $temp = TPaqueteIncluye::find($package_i->id);
+//                            $temp->delete();
+//                        }
+//                        $var_i[] = $package_i->idincluye;
+//                    }
+//                    for($i=0; $i < count($request->input('include')); $i++){
+//                        if (!in_array($request->input('include')[$i], $var_i)){
+//                            $package_included = new TPaqueteIncluye();
+//                            $package_included->idpaquetes = $package->id;
+//                            $package_included->idincluye = $request->input('include')[$i];
+//                            $package_included->save();
+//                        }
+//                    }
+//                }else{
+//                    TPaqueteIncluye::where('idpaquetes', $package->id)->delete();
+//                }
+//
+//                $package_no_included = TPaqueteNoIncluye::where('idpaquetes', $package->id)->get();
+//                $var_i = [];
+//                if ($request->input('noinclude')) {
+//                    foreach ($package_no_included as $package_no_i){
+//                        if (!in_array($package_no_i->idnoincluye, $request->input('noinclude'))){
+//                            $temp = TPaqueteNoIncluye::find($package_no_i->id);
+//                            $temp->delete();
+//                        }
+//                        $var_i[] = $package_no_i->idnoincluye;
+//                    }
+//                    for($i=0; $i < count($request->input('noinclude')); $i++){
+//                        if (!in_array($request->input('noinclude')[$i], $var_i)){
+//                            $package_no_included = new TPaqueteNoIncluye();
+//                            $package_no_included->idpaquetes = $package->id;
+//                            $package_no_included->idnoincluye = $request->input('noinclude')[$i];
+//                            $package_no_included->save();
+//                        }
+//                    }
+//                }else{
+//                    TPaqueteNoIncluye::where('idpaquetes', $package->id)->delete();
+//                }
 
             }
-            return redirect('/home')->with('status', 'Package created successfully');
+//            return redirect('/home')->with('status', 'Package created successfully');
+        return redirect(route('admin_package_edit_path', $package->id))->with('status', 'Package created successfully');
 
     }
 
@@ -295,7 +300,7 @@ class HomeController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'codigo' => 'required',
-            'codigo_f' => 'required',
+//            'codigo_f' => 'required',
             'titulo' => 'required',
             'duracion' => 'required',
         ]);
@@ -307,10 +312,13 @@ class HomeController extends Controller
 
         $package = TPaquete::FindOrFail($id);
         $package->codigo = $request->input('codigo');
-        $package->codigo_f = $request->input('codigo_f');
+//        $package->codigo_f = $request->input('codigo_f');
         $package->titulo = $request->input('titulo');
         $package->duracion = $request->input('duracion');
         $package->descripcion = $request->input('descripcion');
+        $package->incluye = $request->input('txta_included');
+        $package->noincluye = $request->input('txta_not_included');
+        $package->opcional = $request->input('txta_optional');
 
         if ($package->save()){
             TPrecioPaquete::where('idpaquetes', $id)->delete();
@@ -365,25 +373,25 @@ class HomeController extends Controller
 
             }
 
-            TPaqueteIncluye::where('idpaquetes', $id)->delete();
-            for($i=0; $i < count($request->input('incluye')); $i++){
-
-                $package_included = new TPaqueteIncluye();
-                $package_included->idpaquetes = $id;
-                $package_included->idincluye = $request->input('incluye')[$i];
-                $package_included->save();
-
-            }
-
-            TPaqueteNoIncluye::where('idpaquetes', $id)->delete();
-            for($i=0; $i < count($request->input('no_incluye')); $i++){
-
-                $package_no_included = new TPaqueteNoIncluye();
-                $package_no_included->idpaquetes = $id;
-                $package_no_included->idnoincluye = $request->input('no_incluye')[$i];
-                $package_no_included->save();
-
-            }
+//            TPaqueteIncluye::where('idpaquetes', $id)->delete();
+//            for($i=0; $i < count($request->input('incluye')); $i++){
+//
+//                $package_included = new TPaqueteIncluye();
+//                $package_included->idpaquetes = $id;
+//                $package_included->idincluye = $request->input('incluye')[$i];
+//                $package_included->save();
+//
+//            }
+//
+//            TPaqueteNoIncluye::where('idpaquetes', $id)->delete();
+//            for($i=0; $i < count($request->input('no_incluye')); $i++){
+//
+//                $package_no_included = new TPaqueteNoIncluye();
+//                $package_no_included->idpaquetes = $id;
+//                $package_no_included->idnoincluye = $request->input('no_incluye')[$i];
+//                $package_no_included->save();
+//
+//            }
 
         }
         return redirect(route('admin_package_edit_path', $id))->with('status', 'Successfully updated package');
@@ -398,11 +406,15 @@ class HomeController extends Controller
     }
     public function image_store(Request $request)
     {
-        $image = $request->file('file');
         $id_package = $request->get('id_package_file');
 
-        $imageName = $image->getClientOriginalName();
-        $image->move(public_path('images/mapas/'), $imageName);
+        $filenamewithextension = $request->file('file')->getClientOriginalName();
+        $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
+        $extension = $request->file('file')->getClientOriginalExtension();
+        $filenametostore = $filename.'_'.time().'.'.$extension;
+
+        Storage::disk('s3')->put('package/'.$filenametostore, fopen($request->file('file'), 'r+'), 'public');
+        $imageName = Storage::disk('s3')->url('package/'.$filenametostore);
 
         $imageUpload = TPaquete::FindOrFail($id_package);
         $imageUpload->imagen = $imageName;
@@ -413,23 +425,49 @@ class HomeController extends Controller
 
     public function image_delete(Request $request)
     {
-        $filename = $request->get('filename');
-        TItinerarioImagen::where('nombre', $filename)->delete();
-        $path = public_path() . '/images/mapas/' . $filename;
-        if (file_exists($path)) {
-            unlink($path);
-        }
+        $id_package_file = $request->get('id_package_file');
+        $paquete = TPaquete::find($id_package_file);
+
+        $filename = explode('package/', $paquete->imagen);
+        $filename = $filename[1];
+        Storage::disk('s3')->delete('package/'.$filename);
+
+        TPaquete::where('id', $id_package_file)->update(['imagen' => NULL]);
         return $filename;
+    }
+
+    public function image_delete_map_package_form(Request $request)
+    {
+//        $filename = $request->get('filename');
+//        $id_package = $request->get('id_package');
+
+
+        $id_package_file = $request->get('id_package');
+        $paquete = TPaquete::find($id_package_file);
+
+        $filename = explode('package/', $paquete->imagen);
+        $filename = $filename[1];
+        Storage::disk('s3')->delete('package/'.$filename);
+
+        TPaquete::where('id', $id_package_file)->update(['imagen' => NULL]);
+//        return $filename;
+
+        return redirect(route('admin_package_edit_path', $id_package_file))->with('delete', 'Image successfully removed');
     }
 
 
     public function image_store_slider(Request $request)
     {
-        $image = $request->file('file');
         $id_package = $request->get('id_package_file');
 
-        $imageName = $image->getClientOriginalName();
-        $image->move(public_path('images/packages/slider/'), $imageName);
+        $filenamewithextension = $request->file('file')->getClientOriginalName();
+        $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
+        $extension = $request->file('file')->getClientOriginalExtension();
+        $filenametostore = $filename.'_'.time().'.'.$extension;
+
+        Storage::disk('s3')->put('package/slider/'.$filenametostore, fopen($request->file('file'), 'r+'), 'public');
+        $imageName = Storage::disk('s3')->url('package/slider/'.$filenametostore);
+
 
         $imageUpload = new TPaqueteImagen();
         $imageUpload->nombre = $imageName;
@@ -441,41 +479,42 @@ class HomeController extends Controller
 
     public function image_delete_slider(Request $request)
     {
-        $filename = $request->get('filename');
-        TPaqueteImagen::where('nombre', $filename)->delete();
-        $path = public_path() . '/images/packages/slider/' . $filename;
-        if (file_exists($path)) {
-            unlink($path);
-        }
+        $filename = $request->get('name_file');
+        $id_package = $request->get('id_package_file');
+
+        $filename = explode('.', $filename);
+        $filename=$filename[0];
+
+        $tpaquete_imagen = TPaqueteImagen::where('idpaquetes', $id_package)->where('nombre', 'like', '%'.$filename.'%')->first();
+
+        $filename = explode('package/slider/', $tpaquete_imagen->nombre);
+        $filename = $filename[1];
+        Storage::disk('s3')->delete('package/slider/'.$filename);
+
+        TPaqueteImagen::where('id', $tpaquete_imagen->id)->delete();
+
         return $filename;
     }
 
     public function image_delete_package_form(Request $request)
     {
         $filename = $request->get('filename');
+        $id_imagen_package = $request->get('id_imagen_package');
         $id_package = $request->get('id_package');
-        TPaqueteImagen::where('nombre', $filename)->delete();
-        $path = public_path() . '/images/packages/slider/' . $filename;
-        if (file_exists($path)) {
-            unlink($path);
-        }
+
+        $paquete_imagen = TPaqueteImagen::find($id_imagen_package);
+
+        $filename = explode('package/slider/', $paquete_imagen->nombre);
+        $filename = $filename[1];
+        Storage::disk('s3')->delete('package/slider/'.$filename);
+
+        TPaqueteImagen::where('id', $id_imagen_package)->delete();
+
         return redirect(route('admin_package_edit_path', $id_package))->with('delete', 'Image successfully removed');
     }
 
-    public function image_delete_map_package_form(Request $request)
-    {
-        $filename = $request->get('filename');
-        $id_package = $request->get('id_package');
 
-        $imageUpload = TPaquete::FindOrFail($id_package);
-        $imageUpload->imagen = NULL;
-        $imageUpload->save();
 
-        $path = public_path() . '/images/mapas/' . $filename;
-        if (file_exists($path)) {
-            unlink($path);
-        }
-        return redirect(route('admin_package_edit_path', $id_package))->with('delete', 'Image successfully removed');
-    }
+
 
 }
