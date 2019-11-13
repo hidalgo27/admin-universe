@@ -76,7 +76,6 @@ class HomeController extends Controller
         $paquete = TPaquete::where('id', $id)->get();
         $itinerario = TItinerario::get()->take($duration);
         $itinerario_full = TItinerario::all();
-//        dd($itinerario);
 
 
         return view('layouts.admin.load', compact('paquete'), ['itinerario'=>$itinerario, 'itinerario_full' => $itinerario_full]);

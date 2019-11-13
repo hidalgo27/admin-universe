@@ -42,6 +42,11 @@ class ItineraryController extends Controller
         }
     }
 
+    public function create()
+    {
+        return view('admin.itinerary-create');
+    }
+
     public function edit($id)
     {
         $itinerary = TItinerario::with('itinerario_imagen')->where('id', $id)->get();

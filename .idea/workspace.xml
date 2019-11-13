@@ -3,7 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="1116b4c1-522a-4e18-94a8-af48921e490c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/.htaccess" beforeDir="false" afterPath="$PROJECT_DIR$/public/.htaccess" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Admin/HomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Admin/HomeController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/admin/package-edit.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/admin/package-edit.blade.php" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -173,7 +174,8 @@
       <workItem from="1571411415884" duration="445000" />
       <workItem from="1571412420938" duration="13133000" />
       <workItem from="1571486781449" duration="7436000" />
-      <workItem from="1573152903017" duration="3403000" />
+      <workItem from="1573152903017" duration="3842000" />
+      <workItem from="1573397236974" duration="1697000" />
     </task>
     <servers />
   </component>

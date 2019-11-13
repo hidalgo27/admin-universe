@@ -870,7 +870,7 @@
         function duration($duration){
             if ($duration){
                 var $duration1 = $duration;
-                $("#contenido").load("http://new-goto.nu/admin/package/load/"+49+"/"+$duration1+"");
+                $("#contenido").load("/admin/package/load/"+49+"/"+$duration1+"");
             }
         }
 
