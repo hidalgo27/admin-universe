@@ -47,18 +47,18 @@
                     Itinerary
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{route('admin_included_index_path')}}">
-                    <span data-feather="plus"></span>
-                    Included
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{route('admin_not_included_index_path')}}">
-                    <span data-feather="minus"></span>
-                    Not Included
-                </a>
-            </li>
+{{--            <li class="nav-item">--}}
+{{--                <a class="nav-link" href="{{route('admin_included_index_path')}}">--}}
+{{--                    <span data-feather="plus"></span>--}}
+{{--                    Included--}}
+{{--                </a>--}}
+{{--            </li>--}}
+{{--            <li class="nav-item">--}}
+{{--                <a class="nav-link" href="{{route('admin_not_included_index_path')}}">--}}
+{{--                    <span data-feather="minus"></span>--}}
+{{--                    Not Included--}}
+{{--                </a>--}}
+{{--            </li>--}}
             <li class="nav-item">
                 <a class="nav-link" href="{{route('admin_category_index_path')}}">
                     <span data-feather="folder"></span>
@@ -77,18 +77,18 @@
                     Destinations
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{route('admin_testimonial_index_path')}}">
-                    <span data-feather="message-circle"></span>
-                    Testimonials
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{route('admin_video_index_path')}}">
-                    <span data-feather="video"></span>
-                    Video Testimonials
-                </a>
-            </li>
+{{--            <li class="nav-item">--}}
+{{--                <a class="nav-link" href="{{route('admin_testimonial_index_path')}}">--}}
+{{--                    <span data-feather="message-circle"></span>--}}
+{{--                    Testimonials--}}
+{{--                </a>--}}
+{{--            </li>--}}
+{{--            <li class="nav-item">--}}
+{{--                <a class="nav-link" href="{{route('admin_video_index_path')}}">--}}
+{{--                    <span data-feather="video"></span>--}}
+{{--                    Video Testimonials--}}
+{{--                </a>--}}
+{{--            </li>--}}
         </ul>
 
         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">

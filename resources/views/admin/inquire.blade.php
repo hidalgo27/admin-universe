@@ -103,7 +103,7 @@
     @endforeach
 @endsection
 @push('scripts')
-    <script src="https://cloud.tinymce.com/5/tinymce.min.js?apiKey=m4amx6h3rsnmj9whskr1vn3m6mpv7bi6qwwscvtbam4h0uic "></script>
+    <script src="https://cloud.tinymce.com/5/tinymce.min.js?apiKey=4im5y0hsu2i10v7je2aecag5d41lh7hc0oh1mpj0lgv8pmgj "></script>
     <script type="text/javascript">
         tinymce.init({
             selector: 'textarea.textarea-package',
